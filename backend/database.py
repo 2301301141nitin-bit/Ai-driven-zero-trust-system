@@ -35,7 +35,8 @@ class _InMemoryCollection:
     def find(self, query: dict | None = None) -> list[dict[str, Any]]:
         with self._lock:
             if not query:
-                return list(self._docs)
+                # Return copies of documents to avoid callers mutating internal state.
+                return [dict(doc) for doc in self._docs]
             result = []
             for doc in self._docs:
                 if all(doc.get(k) == v for k, v in query.items()):
