@@ -23,20 +23,36 @@ def _clean(doc: dict) -> dict:
 def get_sessions() -> list[dict[str, Any]]:
     """Return all recorded sessions (most recent first, max 200)."""
     db = get_db()
-    docs = db["sessions"].find()
-    docs = [_clean(d) for d in docs]
-    docs.sort(key=lambda d: d.get("timestamp", ""), reverse=True)
-    return docs[:200]
+    collection = db["sessions"]
+    try:
+        # Prefer letting the database handle sorting and limiting when supported.
+        cursor = collection.find().sort("timestamp", -1).limit(200)
+        docs = [_clean(d) for d in cursor]
+        return docs
+    except Exception:
+        # Fallback for in-memory or non-Mongo backends that don't support sort/limit.
+        docs = collection.find()
+        docs = [_clean(d) for d in docs]
+        docs.sort(key=lambda d: d.get("timestamp", ""), reverse=True)
+        return docs[:200]
 
 
 @router.get("/alerts", response_model=list[AlertRecord])
 def get_alerts() -> list[dict[str, Any]]:
     """Return all security alerts (most recent first, max 100)."""
     db = get_db()
-    docs = db["alerts"].find()
-    docs = [_clean(d) for d in docs]
-    docs.sort(key=lambda d: d.get("timestamp", ""), reverse=True)
-    return docs[:100]
+    collection = db["alerts"]
+    try:
+        # Prefer letting the database handle sorting and limiting when supported.
+        cursor = collection.find().sort("timestamp", -1).limit(100)
+        docs = [_clean(d) for d in cursor]
+        return docs
+    except Exception:
+        # Fallback for in-memory or non-Mongo backends that don't support sort/limit.
+        docs = collection.find()
+        docs = [_clean(d) for d in docs]
+        docs.sort(key=lambda d: d.get("timestamp", ""), reverse=True)
+        return docs[:100]
 
 
 @router.get("/stats")
