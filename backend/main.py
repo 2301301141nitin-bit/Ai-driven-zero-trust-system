@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +16,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.models.ai_engine import get_engine
 from backend.routes.behavior import router as behavior_router
 from backend.routes.dashboard import router as dashboard_router
+
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("BACKEND_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    if origin.strip()
+]
 
 # --------------------------------------------------------------------------- #
 # Lifecycle                                                                    #
@@ -44,7 +51,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
