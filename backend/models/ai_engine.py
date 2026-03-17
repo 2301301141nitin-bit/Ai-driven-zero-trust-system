@@ -37,7 +37,7 @@ def _generate_normal_samples(n: int = 2000) -> np.ndarray:
         _RNG.uniform(3, 8, n),                       # typing_speed  (WPM-ish)
         _RNG.uniform(1, 15, n),                      # request_frequency
         _RNG.uniform(5, 60, n),                      # session_duration
-        _RNG.integers(0, 1, n),                      # geo_anomaly (mostly 0)
+        _RNG.binomial(1, 0.02, n),                   # geo_anomaly (mostly 0, rare 1s)
         np.zeros(n),                                 # device_match_inv (known dev)
         _RNG.integers(0, 2, n),                      # failed_attempts
         np.zeros(n),                                 # burst_requests
