@@ -8,6 +8,7 @@ POST /api/behavior
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import logging
 
 from fastapi import APIRouter, HTTPException
 
@@ -26,7 +27,8 @@ def evaluate_behavior(event: BehaviorEvent) -> TrustDecision:
         engine = get_engine()
         trust_score = engine.score(event)
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"AI engine error: {exc}") from exc
+        logging.exception("Error while scoring behavior event with AI engine")
+        raise HTTPException(status_code=500, detail="AI engine error") from exc
 
     decision = evaluate(event, trust_score)
 
