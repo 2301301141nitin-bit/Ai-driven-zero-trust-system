@@ -51,12 +51,18 @@ class TestExtractFeatures:
         assert vec.dtype == np.float32
 
     def test_login_hour_cyclical_encoding(self):
-        """Hour 0 and hour 24 should produce the same encoding."""
+        """Adjacent hours across midnight (23 and 0) should be encoded more similarly than opposite hours (0 and 12)."""
         event_0 = _make_event(login_hour=0)
-        event_24 = _make_event(login_hour=0)   # 24 mod 24 == 0
+        event_23 = _make_event(login_hour=23)
+        event_12 = _make_event(login_hour=12)
         vec_0 = extract_features(event_0)
-        vec_24 = extract_features(event_24)
-        np.testing.assert_array_almost_equal(vec_0[:2], vec_24[:2])
+        vec_23 = extract_features(event_23)
+        vec_12 = extract_features(event_12)
+
+        # Verify cyclical proximity: 23↔0 should be closer in the encoding space than 12↔0.
+        dist_0_23 = np.linalg.norm(vec_0[:2] - vec_23[:2])
+        dist_0_12 = np.linalg.norm(vec_0[:2] - vec_12[:2])
+        assert dist_0_23 < dist_0_12
 
     def test_device_match_inverted(self):
         """device_match=1 → device_match_inv=0 in the feature vector."""
