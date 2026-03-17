@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pandas as pd
 import plotly.express as px
@@ -262,7 +262,7 @@ def render() -> None:
     # ---------- Auto-refresh ------------------------------------------------ #
     st.divider()
     st.caption(
-        f"Last updated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC  •  "
+        f"Last updated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC  •  "
         f"Auto-refresh every {REFRESH_INTERVAL}s"
     )
     time.sleep(REFRESH_INTERVAL)
